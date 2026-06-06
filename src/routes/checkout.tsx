@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCart, fmt } from "@/lib/cart-store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -34,6 +37,7 @@ const paymentOptions = [
 
 function Checkout() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { items, subtotal, clear } = useCart();
   const [step, setStep] = useState<Step>(0);
   const [ship, setShip] = useState({
@@ -42,7 +46,28 @@ function Checkout() {
   const [method, setMethod] = useState(shippingOptions[0].id);
   const [payment, setPayment] = useState(paymentOptions[0].id);
   const [card, setCard] = useState({ number: "", exp: "", cvv: "", name: "" });
-  const [orderId] = useState(() => `LX-2026-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [orderNumber, setOrderNumber] = useState(() => `LX-2026-${Math.floor(100000 + Math.random() * 900000)}`);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Prefill from profile when signed in
+  useEffect(() => {
+    if (!user) return;
+    setShip((s) => ({ ...s, email: s.email || user.email || "" }));
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => {
+      if (!data) return;
+      setShip((s) => ({
+        name: s.name || data.full_name || "",
+        email: s.email || data.email || user.email || "",
+        phone: s.phone || data.phone || "",
+        country: data.shipping_country || s.country,
+        line1: s.line1 || data.shipping_line1 || "",
+        line2: s.line2 || data.shipping_line2 || "",
+        city: s.city || data.shipping_city || "",
+        state: s.state || data.shipping_state || "",
+        zip: s.zip || data.shipping_zip || "",
+      }));
+    });
+  }, [user]);
 
   const shipPrice = shippingOptions.find((s) => s.id === method)?.price ?? 0;
   const sub = subtotal();
@@ -59,7 +84,35 @@ function Checkout() {
     );
   }
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
+    if (!user) {
+      toast.error("Please sign in to complete your order.");
+      navigate({ to: "/auth" });
+      return;
+    }
+    setSubmitting(true);
+    const number = `LX-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+    const methodLabel = shippingOptions.find((s) => s.id === method)?.label ?? method;
+    const paymentLabel = paymentOptions.find((p) => p.id === payment)?.label ?? payment;
+    const { error } = await supabase.from("orders").insert({
+      user_id: user.id,
+      order_number: number,
+      status: "confirmed",
+      items: items.map((i) => ({ name: i.name, color: i.color, qty: i.qty, price: i.price, size: i.size })),
+      subtotal: sub,
+      shipping_cost: shipPrice,
+      tax,
+      total,
+      shipping_method: methodLabel,
+      payment_method: paymentLabel,
+      shipping_address: ship,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setOrderNumber(number);
     setStep(4);
     setTimeout(() => {
       confetti({
