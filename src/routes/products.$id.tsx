@@ -5,7 +5,7 @@ import { useCart, fmt } from "@/lib/cart-store";
 import { useState } from "react";
 
 export const Route = createFileRoute("/products/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }): { product: import("@/lib/products").Product } => {
     const product = getProduct(params.id);
     if (!product) throw notFound();
     return { product };
