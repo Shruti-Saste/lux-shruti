@@ -1,17 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/lib/cart-store";
+import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
-
-const nav = [
-  { to: "/", label: "Maison" },
-  { to: "/shop", label: "Boutique" },
-  { to: "/shop", label: "Atelier", search: { category: "Handbags" } },
-  { to: "/shop", label: "Horlogerie", search: { category: "Watches" } },
-] as const;
 
 export function Header() {
   const open = useCart((s) => s.open);
   const count = useCart((s) => s.items.reduce((n, i) => n + i.qty, 0));
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,11 +24,8 @@ export function Header() {
     >
       <div className="mx-auto max-w-[1400px] px-6 lg:px-10 h-20 flex items-center justify-between">
         <div className="flex-1 hidden md:flex items-center gap-8">
-          {nav.slice(0, 2).map((n) => (
-            <Link key={n.label} to={n.to} className="hairline gold-underline">
-              {n.label}
-            </Link>
-          ))}
+          <Link to="/" className="hairline gold-underline">Maison</Link>
+          <Link to="/shop" className="hairline gold-underline">Boutique</Link>
         </div>
 
         <Link to="/" className="flex flex-col items-center group">
@@ -44,7 +36,11 @@ export function Header() {
         </Link>
 
         <div className="flex-1 flex items-center justify-end gap-6">
-          <button className="hairline hidden md:inline gold-underline">Account</button>
+          {user ? (
+            <Link to="/account" className="hairline gold-underline hidden md:inline">Account</Link>
+          ) : (
+            <Link to="/auth" className="hairline gold-underline hidden md:inline">Sign In</Link>
+          )}
           <button onClick={open} className="hairline gold-underline relative flex items-center gap-2">
             Cart
             {count > 0 && (
