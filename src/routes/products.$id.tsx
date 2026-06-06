@@ -36,7 +36,7 @@ export const Route = createFileRoute("/products/$id")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: import("@/lib/products").Product };
   const add = useCart((s) => s.add);
   const [color, setColor] = useState(product.colors[0]);
   const [size, setSize] = useState(product.category === "Shoes" ? "37" : "M");
