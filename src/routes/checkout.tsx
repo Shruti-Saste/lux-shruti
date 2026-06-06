@@ -262,12 +262,13 @@ function Checkout() {
                   <span className="font-serif text-4xl text-onyx">✓</span>
                 </div>
                 <h2 className="font-serif text-5xl">Thank you.</h2>
-                <p className="hairline gold-shimmer mt-4">Order {orderId}</p>
+                <p className="hairline gold-shimmer mt-4">Order {orderNumber}</p>
                 <p className="text-muted-foreground text-sm mt-6 max-w-md mx-auto">
                   A confirmation has been dispatched to your inbox. Your atelier specialist will be in touch shortly to coordinate delivery.
                 </p>
                 <div className="flex gap-3 justify-center mt-10">
-                  <button onClick={() => navigate({ to: "/shop" })} className="btn-luxe">Continue Shopping</button>
+                  <Link to="/account" className="btn-luxe">View Order</Link>
+                  <button onClick={() => navigate({ to: "/shop" })} className="btn-ghost-luxe">Continue Shopping</button>
                 </div>
               </motion.div>
             )}
