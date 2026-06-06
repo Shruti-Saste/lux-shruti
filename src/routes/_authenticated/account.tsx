@@ -57,7 +57,7 @@ function Account() {
         supabase.from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
       setProfile(p as Profile | null);
-      setOrders((o as OrderRow[]) ?? []);
+      setOrders(((o as unknown) as OrderRow[]) ?? []);
     })();
   }, [user]);
 
