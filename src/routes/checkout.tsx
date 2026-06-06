@@ -251,7 +251,9 @@ function Checkout() {
                 </div>
                 <div className="flex gap-3 mt-10">
                   <button onClick={() => setStep(2)} className="btn-ghost-luxe">Back</button>
-                  <button onClick={placeOrder} className="btn-luxe">Place Order · {fmt(total)}</button>
+                  <button onClick={placeOrder} disabled={submitting} className="btn-luxe">
+                    {submitting ? "Placing order…" : user ? `Place Order · ${fmt(total)}` : `Sign In to Place Order · ${fmt(total)}`}
+                  </button>
                 </div>
               </motion.div>
             )}
