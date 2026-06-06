@@ -83,9 +83,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "LUXÉRIA — Maison de Couture" },
       { name: "description", content: "An immersive 3D atelier of luxury handbags, watches, jewelry and ready-to-wear. Hand-finished in Florence, Paris and Switzerland." },
       { property: "og:title", content: "LUXÉRIA — Maison de Couture" },
-      { property: "og:description", content: "An immersive 3D atelier of luxury handbags, watches, jewelry and ready-to-wear." },
+      { property: "og:description", content: "An immersive 3D atelier of luxury handbags, watches, jewelry and ready-to-wear. Hand-finished in Florence, Paris and Switzerland." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "LUXÉRIA — Maison de Couture" },
+      { name: "twitter:description", content: "An immersive 3D atelier of luxury handbags, watches, jewelry and ready-to-wear. Hand-finished in Florence, Paris and Switzerland." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
